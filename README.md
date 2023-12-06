@@ -43,11 +43,11 @@ cache-dependency-path: '**/package-lock.json' # THIS PATTERN did the trick for m
           path: 'my-first-react-app/dist'
 ```
 
-We modify `vite.config.js` with the name of our current directory
+We modify `vite.config.js` with the name of our github directory
 ```JS
 export default defineConfig({
   plugins: [react()],
-  base: '/my-first-react-app/'
+  base: '/Vite-React/'
 })
 
 ```
