@@ -20,6 +20,12 @@ export default function Root() {
     const navigation = useNavigation();
     const submit = useSubmit();
 
+    const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has(
+      "q"
+    );
+
     useEffect(() => {
       setQuery(q);
     }, [q]);
@@ -32,6 +38,7 @@ export default function Root() {
             <Form id="search-form" role="search">
               <input
                 id="q"
+                className={searching ? "loading" : ""}
                 aria-label="Search contacts"
                 placeholder="Search"
                 type="search"
@@ -39,13 +46,16 @@ export default function Root() {
                 defaultValue={q}
                 onChange={(event) => {
                   setQuery(event.target.value);
-                  submit(event.currentTarget.form);
+                  const isFirstSearch = q == null;
+                  submit(event.currentTarget.form, {
+                    replace: !isFirstSearch,
+                  });
                 }}
               />
               <div
                 id="search-spinner"
                 aria-hidden
-                hidden={true}
+                hidden={!searching}
               />
               <div
                 className="sr-only"

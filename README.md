@@ -345,6 +345,91 @@ onChange={(event) => {
 }}
 ```
 
+### Managing Form Submissions
+Since a new form is submitted every time we type, we end up with multiple form submissions in the browser. This is bad because:
+
+- Our browser search history becomes full
+- We cannot go back to the previous page easily. For example ([q=John, q=Joh, q=Jo, q=J])
+
+We need to replace our current entry in the history stack with the next page. 
+```JSX
+onChange={(event) => {
+  setQuery(event.target.value);
+  const isFirstSearch = q == null;
+  submit(event.currentTarget.form, {
+    replace: !isFirstSearch,
+  });
+}}
+```
+
+## Change Data State (Mutations) without Navigation
+The `useFetcher` hook allows us to communicate with loaders and actions without navigating away from a page. This is useful for toggle actions and ratings. 
+
+Examples:
+- Setting an item as a favourite
+- Toggle yes/no settings
+- Giving a rating to a product
+- Adding an item to a shopping cart?
+
+In `contact.jsx` we want to set a contact as our favourites. 
+We wrap our button inside `fetcher.Form`
+
+```JSX
+import {
+  ...
+  useFetcher,
+} from "react-router-dom";
+
+// Inside the Favourite function
+const fetcher = useFetcher();
+
+<fetcher.Form method="post">
+      <button
+        name="favorite"
+        value={favorite ? "false" : "true"}
+        aria-label={
+          favorite
+            ? "Remove from favorites"
+            : "Add to favorites"
+        }
+      >
+        {favorite ? "★" : "☆"}
+      </button>
+    </fetcher.Form>
+```
+
+`fetcher.Form` will create a POST request to the same URL as the contact form `contacts/:contactId`
+
+Next we create an action in `contact.jsx` to handle the form submission. 
+
+```JSX
+import { getContact, updateContact } from "../contacts";
+
+export async function action({ request, params }) {
+  let formData = await request.formData();
+  return updateContact(params.contactId, {
+    favorite: formData.get("favorite") === "true",
+  });
+}
+```
+
+Lastly we connect the action to the router
+
+`main.jsx`
+```JSX
+import Contact, {
+  loader as contactLoader,
+  action as contactAction,
+} from "./routes/contact";
+
+{
+        path: "contacts/:contactId",
+        element: <Contact />,
+        loader: contactLoader,
+        action: contactAction,
+},
+```
+
 ## Navigation and Styling
 ### Active Link
 When the links on the navbar are clicked, we want to show the link that is currently active. 
@@ -386,7 +471,7 @@ When a user navigates away from a page, we want to provide the user with some fe
 
 The `useNavigation()` hook allows us to set transtion states. 
 
-When the state is set to `loading` there will be a CSS Fade animation. 
+When the 'searching' state is set to `loading` we want to show a search spinner. 
 
 `root.jsx`
 
@@ -398,9 +483,26 @@ import {
 
 const navigation = useNavigation();
 
+const searching =
+navigation.location &&
+new URLSearchParams(navigation.location.search).has(
+  "q"
+);
+
+// Add this class to the form input
+className={searching ? "loading" : ""}
+
+// Add this class to the sidebar
 className={
   navigation.state === "loading" ? "loading" : ""
 }
+
+// Only show when searching state has value
+<div
+  id="search-spinner"
+  aria-hidden
+  hidden={!searching}
+/>
 ```
 
 ### Back Button
@@ -425,3 +527,8 @@ const navigate = useNavigate();
 Cancel
 </button>
 ```
+
+### Error Handling for All Routes
+We want our error pages to render inside our root component. 
+
+To accomplish this, we wrap our error element inside our children in the router. 
