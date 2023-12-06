@@ -20,7 +20,7 @@ First, we need to create a github actions yml file. This file will help us run n
 
 Note that we need to modify our yml file slightly to cd into our app directory. 
 
-We modify `vite.config.js` with the name of our github repo
+We modify `vite.config.js` with the name of our current directory
 ```JS
 export default defineConfig({
   plugins: [react()],

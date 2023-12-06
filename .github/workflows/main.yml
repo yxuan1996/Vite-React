@@ -27,11 +27,12 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./my-first-react-app
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: cd to directory
-        run: cd my-first-react-app
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
