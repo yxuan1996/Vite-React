@@ -18,6 +18,8 @@ https://dev.to/daslaw/deploying-a-vite-app-to-github-pages-using-github-actions-
 
 First, we need to create a github actions yml file. This file will help us run npm install and npm build when we push to repo. 
 
+Note that we need to modify our yml file slightly to cd into our app directory. 
+
 We modify `vite.config.js` with the name of our github repo
 ```JS
 export default defineConfig({
