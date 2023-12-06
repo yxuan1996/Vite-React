@@ -18,6 +18,12 @@ https://dev.to/daslaw/deploying-a-vite-app-to-github-pages-using-github-actions-
 
 First, we need to create a github actions yml file. This file will help us run npm install and npm build when we push to repo. 
 
+https://stackoverflow.com/questions/67831018/github-actions-upload-artifact-not-finding-provided-path-from-npm-run-build
+
+Fun fact about github actions:
+- When we set the default working directory, this is only used by `run:` commands
+- `uses` commands are run from the base directory. Hence, we need to specify the full path. 
+
 Note that we need to modify our yml file slightly to 
 - cd into our app directory. 
 - Set the npm cache dependency path. 
@@ -28,6 +34,13 @@ defaults:
         working-directory: 'my-first-react-app'
 
 cache-dependency-path: '**/package-lock.json' # THIS PATTERN did the trick for me.
+
+# Specify full path when uploading artifact
+- name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # Upload dist repository
+          path: 'my-first-react-app/dist'
 ```
 
 We modify `vite.config.js` with the name of our current directory
