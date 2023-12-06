@@ -279,8 +279,73 @@ In `main.jsx`, `index: true` tells the app to render this route when no other ch
 { index: true, element: <Index /> },
 ```
 
+## Search
+- In `root.jsx` we have a search form that filter the list of entries in the navbar. 
+- Since we did not specify the method, the form uses the default GET request. 
+- Form inputs will appear as URL Params based on their name. For example, if we have 2 inputs with the names "first" and "last", the URL will be `[https://[URL]/first=[?]&last=[?]]`
 
-## Styling
+In `root.jsx` the contacts in the navbar are loaded using a `loader` function. We can modify the loader function to filter for contacts based on the URL params. 
+
+```JSX
+export async function loader({ request }) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
+  const contacts = await getContacts(q);
+  return { contacts };
+}
+```
+
+### Synchronizing URL to form state
+We want to ensure that our URL and form state is always in sync. Our URL can change when the user clicks the back button. On the other hand, our form state may change when the user refreshes the page. 
+
+To keep the states in sync, we will use React `useState` and `useEffect` hooks. 
+
+To start, we modify our loader function to return both the `contacts` and the `query`. We also set the default form input to the value of q.
+
+```JSX
+export async function loader({ request }) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q") || "";
+  const contacts = await getContacts(q);
+  return { contacts, q };
+}
+
+const { contacts, q } = useLoaderData();
+const [query, setQuery] = useState(q);
+
+// Sync the state when the URL Param changes
+useEffect(() => {
+    setQuery(q);
+  }, [q])
+
+// Inside the form input
+value={query}
+  onChange={(e) => {
+    setQuery(e.target.value);
+  }}
+```
+
+### Filter as we type
+We want our list to be filtered as we type, instead of when we click the submit button. 
+
+We import the `useSubmit` module and attach it to the `onChange` event handler of the input field. Now, whenever the input field changes, the form is auto-submitted, allowing us to filter as we type. 
+
+`root.jsx`
+```JSX
+import {
+  // existing code
+  useSubmit,
+} from "react-router-dom";
+
+const submit = useSubmit();
+
+// Inside the form input
+onChange={(event) => {
+  submit(event.currentTarget.form);
+}}
+```
+
+## Navigation and Styling
 ### Active Link
 When the links on the navbar are clicked, we want to show the link that is currently active. 
 
@@ -338,3 +403,25 @@ className={
 }
 ```
 
+### Back Button
+On the edit page, we have a cancel button. We want the button to do the same thing as the browser's back button. 
+
+In `edit.jsx` we import the `useNavigate()` module and use `navigate(-1)` to go back to the previous page
+
+```JSX
+import {
+  ...
+  useNavigate,
+} from "react-router-dom";
+
+const navigate = useNavigate();
+
+<button
+  type="button"
+  onClick={() => {
+    navigate(-1);
+  }}
+>
+Cancel
+</button>
+```

@@ -1,9 +1,12 @@
-import { Outlet, NavLink, Link, useLoaderData, Form, redirect, useNavigation} from "react-router-dom";
+import { Outlet, NavLink, Link, useLoaderData, Form, redirect, useNavigation, useSubmit} from "react-router-dom";
 import { getContacts, createContact } from "../contacts";
+import { useEffect, useState } from "react";
 
-export async function loader() {
-  const contacts = await getContacts();
-  return { contacts };
+export async function loader({ request }) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q") || "";
+  const contacts = await getContacts(q);
+  return { contacts, q };
 }
 
 export async function action() {
@@ -12,20 +15,32 @@ export async function action() {
 }
 
 export default function Root() {
-    const { contacts } = useLoaderData();
+    const { contacts, q } = useLoaderData();
+    const [query, setQuery] = useState(q);
     const navigation = useNavigation();
+    const submit = useSubmit();
+
+    useEffect(() => {
+      setQuery(q);
+    }, [q]);
+
     return (
       <>
         <div id="sidebar">
           <h1>React Router Contacts</h1>
           <div>
-            <form id="search-form" role="search">
+            <Form id="search-form" role="search">
               <input
                 id="q"
                 aria-label="Search contacts"
                 placeholder="Search"
                 type="search"
                 name="q"
+                defaultValue={q}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  submit(event.currentTarget.form);
+                }}
               />
               <div
                 id="search-spinner"
@@ -36,7 +51,7 @@ export default function Root() {
                 className="sr-only"
                 aria-live="polite"
               ></div>
-            </form>
+            </Form>
             <Form method="post">
               <button type="submit">New</button>
             </Form>
