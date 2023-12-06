@@ -18,18 +18,30 @@ https://dev.to/daslaw/deploying-a-vite-app-to-github-pages-using-github-actions-
 
 First, we need to create a github actions yml file. This file will help us run npm install and npm build when we push to repo. 
 
-Note that we need to modify our yml file slightly to cd into our app directory. 
+Note that we need to modify our yml file slightly to 
+- cd into our app directory. 
+- Set the npm cache dependency path. 
+
+```YML
+defaults:
+      run:
+        working-directory: 'my-first-react-app'
+
+cache-dependency-path: '**/package-lock.json' # THIS PATTERN did the trick for me.
+```
 
 We modify `vite.config.js` with the name of our current directory
 ```JS
 export default defineConfig({
   plugins: [react()],
-  base: '/Vite-React/'
+  base: '/my-first-react-app/'
 })
 
 ```
 
 In Github `Settings > Actions > General`, we need to enable `read and write` workflow permissions. 
+
+In Github `Settings > Pages`, we need to set the source as Github Actions. 
 
 
 ### Deploying React App to Github pages
