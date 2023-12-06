@@ -16,6 +16,8 @@ npm run dev
 ### Deploying Vite App to Github pages
 https://dev.to/daslaw/deploying-a-vite-app-to-github-pages-using-github-actions-a-step-by-step-guide-2p4h
 
+https://gist.github.com/Ronin1702/f2203b1f4500a8eb99107b2365ffd1f5
+
 First, we need to create a github actions yml file. This file will help us run npm install and npm build when we push to repo. 
 
 https://stackoverflow.com/questions/67831018/github-actions-upload-artifact-not-finding-provided-path-from-npm-run-build
@@ -51,6 +53,10 @@ export default defineConfig({
 })
 
 ```
+
+In `package.json` specify the homepage as `"homepage": "https://[Github Username].github.io/[repoName]/",`
+
+In `main.jsx` we need to set our root path equal to ` /<repo_name>/`
 
 In Github `Settings > Actions > General`, we need to enable `read and write` workflow permissions. 
 

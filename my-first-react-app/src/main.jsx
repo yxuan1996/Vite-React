@@ -15,7 +15,7 @@ import './index.css'
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/Vite-React/",
     element: <Root />,
     errorElement: <ErrorPage />,
     loader: rootLoader,
