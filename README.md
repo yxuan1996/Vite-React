@@ -13,6 +13,36 @@ npm install
 npm run dev
 ```
 
+### Deploying Vite App to Github pages
+https://dev.to/daslaw/deploying-a-vite-app-to-github-pages-using-github-actions-a-step-by-step-guide-2p4h
+
+First, we need to create a github actions yml file. This file will help us run npm install and npm build when we push to repo. 
+
+We modify `vite.config.js` with the name of our github repo
+```JS
+export default defineConfig({
+  plugins: [react()],
+  base: '/Vite-React/'
+})
+
+```
+
+In Github `Settings > Actions > General`, we need to enable `read and write` workflow permissions. 
+
+
+### Deploying React App to Github pages
+Since we are using Vite, we should use the method above to deploy to github pages. 
+
+https://github.com/gitname/react-gh-pages
+
+Install the gh-pages npm package in my-first-react-app
+```
+npm install gh-pages --save-dev
+```
+
+
+
+
 ## React Router
 We will be implementing React Router by following along the tutorial: https://reactrouter.com/en/main/start/tutorial
 
